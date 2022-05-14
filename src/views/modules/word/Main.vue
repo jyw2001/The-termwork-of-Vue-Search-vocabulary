@@ -16,19 +16,19 @@
     </div>
     <!-- 按键部分 -->
     <div class="buttons">
-      <van-button type="warning" style="width: 88px" @click="showWordTranslation">翻译</van-button>
-      <van-button type="info" style="width: 88px" @click="CollectWord">收藏</van-button>
-      <van-button type="primary" style="width: 88px" @click="getOneWord">认识</van-button>
+      <van-button type="warning" class="button1" @click="showWordTranslation" v-if="FYflag">翻译</van-button>
+      <van-button type="info" class="button2" @click="CollectWord" v-if="SCflag">收藏</van-button>
+      <van-button type="primary" class="button2" @click="GetWord" v-if="RSflag">认识</van-button>
     </div>
     <!-- 底部 -->
-    <van-tabbar v-model="tabbar_active" @change="onTabBarChange">
-      <van-tabbar-item name="home" icon="home-o">主页</van-tabbar-item>
+    <van-tabbar v-model="active" @change="onTabBarChange">
+    
       <van-tabbar-item name="search" icon="search">搜索</van-tabbar-item>
-      <van-tabbar-item name="friends" icon="friends-o">圈子</van-tabbar-item>
+      <van-tabbar-item name="Shoucang" icon="star">收藏</van-tabbar-item>
       <van-tabbar-item name="setting" icon="setting-o">设置</van-tabbar-item>
     </van-tabbar>
     <!-- 点开all后的内容 -->
-    <van-popup v-model="popShow" round position="bottom" :style="{ height: '50%' }">
+    <!-- <van-popup v-model="popShow" round position="bottom" :style="{ height: '50%' }">
       <van-picker
           title="单词范围"
           show-toolbar
@@ -37,21 +37,30 @@
           @cancel="onPopCancel"
           @change="onPopChange"
       />
-    </van-popup>
+    </van-popup> -->
 
   </div>
 </template>
 
 <script>
+import { Toast } from "vant";
+import { Notify } from 'vant';
+
 
 export default {
   data() {
     return {
       SearchWord:'输入要查询单词',
+      FYflag:true,
+      SCflag:false,
+      RSflag:false,
+      TBflag:'search',
+      
+      active: 'search',
       range: 'ALL',
       columns: ['ALL', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
         'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],//单词开头选项
-      tabbar_active: 'home',
+      
       popShow: false, // 弹出框
       word: {
         wordId: '',//单词编号
@@ -59,61 +68,102 @@ export default {
         wordPrompt: '',
         wordTranslation: ''//单词意思
       },
-      wordPromptShow: '',
-      wordTranslationShow: ''
+      wordPromptShow: '测试-英文',
+      wordTranslationShow: '测试-翻译中文'
     }
   },
   methods: {
     //显示单词
-    getOneWord() {
-      this.$http.get(`/word/getOne/${this.range}`).then(res => {
-        this.wordPromptShow = ''
-        this.wordTranslationShow = ''
-        if (res.data.code === -1) {
-          this.$toast("该范围单词集合为空")
-          return false
-        }
-        this.word = res.data.word
-      }).catch(err => {
-        console.log(err)
-      })
-    },
+    // getOneWord() {
+    //   this.$http.get(`/word/getOne/${this.range}`).then(res => {
+    //     this.wordPromptShow = ''
+    //     this.wordTranslationShow = ''
+    //     if (res.data.code === -1) {
+    //       this.$toast("该范围单词集合为空")
+    //       return false
+    //     }
+    //     this.word = res.data.word
+    //   }).catch(err => {
+    //     console.log(err)
+    //   })
+    // },
     SearchBox(){
       this.SearchWord=''
     },
-    CollectWord() {
-      
-    },
-    showWordTranslation() {
-      this.wordTranslationShow = this.word.wordTranslation
-    },
-    onClickLeft () {
-      this.$toast('暂未开放')
-    },
-    /** 切换单词范围 */
-    onClickRight () {
-      this.popShow = !this.popShow
-    },
-    // 页面切换
-    onTabBarChange (index) {
-      if (index !== 1) {
-        this.$toast('暂未开放')
-        this.tabbar_active = 'home'
+    GetWord(){
+      if(this.TBflag=='search'){
+        this.FYflag=true;
+        this.SCflag=false;
+        this.RSflag=false;
+      }
+      else{
+        this.FYflag=false;
+        this.SCflag=true;
+        this.RSflag=true;
       }
     },
-    onPopConfirm(value, index) {
-      this.range = value
-      this.popShow = false
-      this.getOneWord()
+    CollectWord() {
+      if(this.TBflag=='search'){
+        this.FYflag=true;
+        this.SCflag=false;
+        this.RSflag=false;
+      }
+      else{
+        this.FYflag=false;
+        this.SCflag=true;
+        this.RSflag=true;
+      }
+
     },
-    onPopChange(picker, value, index) {
+    showWordTranslation() {
+        this.FYflag=false;
+        this.SCflag=true;
+        this.RSflag=true;
+
+
+      
     },
-    onPopCancel() {
-      this.popShow = false
-    }
+
+    // onClickLeft () {
+    //   this.$toast('暂未开放')
+    // },
+    /** 切换单词范围 */
+    // onClickRight () {
+    //   this.popShow = !this.popShow
+    // },
+    // 页面切换
+    onTabBarChange (index) {
+      if(index=="setting"){
+        Notify({ type: 'primary', message: '未开放' });
+        return this.active="search";
+      }
+      else if(index=='search'){
+        this.FYflag=true;
+        this.SCflag=false;
+        this.RSflag=false;
+      }
+      else{
+        this.FYflag=false;
+        this.SCflag=true;
+        this.RSflag=true;
+      }
+      this.active=index;
+      this.TBflag=index;
+      
+    },
+    // onPopConfirm(value, index) {
+    //   this.range = value
+    //   this.popShow = false
+    //   this.getOneWord()
+    // },
+    // onPopChange(picker, value, index) {
+    // },
+    // onPopCancel() {
+    //   this.popShow = false
+    // }
   },
   mounted() {
-    this.getOneWord()
+    this.GetWord()
   }
 }
 </script>
@@ -126,7 +176,7 @@ export default {
 }
 .SearchBox{
   height: 25px;
-  width: 280px;
+  width:80%;
 }
   
 
@@ -134,7 +184,7 @@ export default {
 /* 中间样式 */
 .card {
   margin: 20px 15px 24px 15px;
-  padding: 20px;
+  padding: 24px;
   background-color: #fff;
   border-radius: 12px;
   box-shadow: 0 8px 12px grey;
@@ -158,8 +208,18 @@ export default {
 
   display: flex;
   justify-content: space-between;
-  margin-left: 15px;
-  margin-right: 15px;
+
+
+}
+.button1{
+  margin-left: 40%;
+  width: 88px
+}
+.button2{
+  width: 88px;
+  margin-left: 50px;
+  margin-right: 50px;
+
 
 }
 </style>

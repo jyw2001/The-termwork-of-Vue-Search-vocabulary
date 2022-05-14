@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import {
-    Button, NavBar, Toast, Tabbar, TabbarItem, Col, Row, Picker, Popup
+    Button, NavBar, Toast, Tabbar, TabbarItem, Col, Row, Picker, Popup,
 } from 'vant'
 
 
