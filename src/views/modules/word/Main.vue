@@ -27,18 +27,6 @@
       <van-tabbar-item name="Shoucang" icon="star">收藏</van-tabbar-item>
       <van-tabbar-item name="setting" icon="setting-o">设置</van-tabbar-item>
     </van-tabbar>
-    <!-- 点开all后的内容 -->
-    <!-- <van-popup v-model="popShow" round position="bottom" :style="{ height: '50%' }">
-      <van-picker
-          title="单词范围"
-          show-toolbar
-          :columns="columns"
-          @confirm="onPopConfirm"
-          @cancel="onPopCancel"
-          @change="onPopChange"
-      />
-    </van-popup> -->
-
   </div>
 </template>
 
@@ -124,17 +112,14 @@ export default {
       
     },
 
-    // onClickLeft () {
-    //   this.$toast('暂未开放')
-    // },
-    /** 切换单词范围 */
-    // onClickRight () {
-    //   this.popShow = !this.popShow
-    // },
     // 页面切换
     onTabBarChange (index) {
       if(index=="setting"){
         Notify({ type: 'primary', message: '未开放' });
+        this.FYflag=true;
+        this.SCflag=false;
+        this.RSflag=false;
+        this.TBflag="search";
         return this.active="search";
       }
       else if(index=='search'){
@@ -169,7 +154,7 @@ export default {
 </script>
 
 <style scoped>
-/* 单词样式 */
+
 #word-main {
   height: 100%;
   background-color: #f7f8fa;
