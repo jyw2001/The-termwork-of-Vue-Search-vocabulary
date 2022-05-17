@@ -1,7 +1,27 @@
 "use strict";
+import Vue from 'vue'
+import axios from 'axios'
+import VueAxios from 'vue-axios'
 
-import Vue from 'vue';
-import axios from "axios";
+Vue.use(VueAxios, axios)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Full config:  https://github.com/axios/axios#request-config
 // axios.defaults.baseURL = process.env.baseURL || process.env.apiUrl || '';
@@ -13,6 +33,8 @@ let config = {
   // timeout: 60 * 1000, // Timeout
   // withCredentials: true, // Check cross-site Access-Control
 };
+
+
 
 const _axios = axios.create(config);
 
