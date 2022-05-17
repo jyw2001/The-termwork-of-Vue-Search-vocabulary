@@ -8,7 +8,7 @@
     <!-- 中间主体 -->
     <div class="card" >
       <!-- 字体颜色没有变化 -->
-      <input v-model="SearchWord" @click="SearchBox" class="SearchBox">
+      <input id='Serach' v-model="SearchWord" @click="SearchBox" class="SearchBox">
     </div>
     <div class="card-info">
       <p v-text="wordPromptShow"></p>
@@ -31,7 +31,6 @@
 </template>
 
 <script>
-import { Toast } from "vant";
 import { Notify } from 'vant';
 
 
