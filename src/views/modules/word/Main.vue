@@ -18,7 +18,7 @@
     <div class="buttons">
       <van-button type="warning" class="button1" @click="showWordTranslation" v-if="FYflag">翻译</van-button>
       <van-button type="info" class="button2" @click="CollectWord" v-if="SCflag">收藏</van-button>
-      <van-button type="primary" class="button2" @click="GetWord" v-if="RSflag">认识</van-button>
+      <van-button type="primary" class="button2" @click="StartTab" v-if="RSflag">认识</van-button>
     </div>
     <!-- 底部 -->
     <van-tabbar v-model="active" @change="onTabBarChange">
@@ -31,8 +31,29 @@
 </template>
 
 <script>
-import { Notify } from 'vant';
+import Axios from 'axios';
+import CryptoJS from 'ajax';
 
+
+// api 传入数据
+var appKey = '78118035c259a1c6';
+var key = '7jv0TQz2FRVc5Q6FbzBhn70l1UwhCjBM';//注意：暴露appSecret，有被盗用造成损失的风险
+var salt = (new Date).getTime();
+var curtime = Math.round(new Date().getTime()/1000);
+var query = 'good';
+// 多个query可以用\n连接  如 query='apple\norange\nbanana\npear'
+var from = 'en';
+var to = 'zh-CHS';
+var str1 = appKey + truncate(query) + salt + curtime + key;
+var vocabId =  '';
+//console.log('---',str1);
+var sign = CryptoJS.SHA256(str1).toString(CryptoJS.enc.Hex);
+
+function truncate(q){
+    var len = q.length;
+    if(len<=20) return q;
+    return q.substring(0, 10) + len + q.substring(len-10, len);
+}
 
 export default {
   data() {
@@ -44,9 +65,7 @@ export default {
       TBflag:'search',
       
       active: 'search',
-      range: 'ALL',
-      columns: ['ALL', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-        'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],//单词开头选项
+
       
       popShow: false, // 弹出框
       word: {
@@ -60,24 +79,30 @@ export default {
     }
   },
   methods: {
-    //显示单词
-    // getOneWord() {
-    //   this.$http.get(`/word/getOne/${this.range}`).then(res => {
-    //     this.wordPromptShow = ''
-    //     this.wordTranslationShow = ''
-    //     if (res.data.code === -1) {
-    //       this.$toast("该范围单词集合为空")
-    //       return false
-    //     }
-    //     this.word = res.data.word
-    //   }).catch(err => {
-    //     console.log(err)
-    //   })
-    // },
+    request(){
+      Axios.get('/api/api',{
+        q: query,
+        appKey: appKey,
+        salt: salt,
+        from: from,
+        to: to,
+        sign: sign,
+        signType: "v3",
+        curtime: curtime,
+        vocabId: vocabId,
+      }).then(res=>{
+        console.log(res.data);
+        // console.log(this.wordTranslationShow=res.data[1].data[2].data); 
+
+      }).catch(res=>{
+        console.log(res);
+      })
+    },
+
     SearchBox(){
       this.SearchWord=''
     },
-    GetWord(){
+    StartTab(){
       if(this.TBflag=='search'){
         this.FYflag=true;
         this.SCflag=false;
@@ -106,6 +131,7 @@ export default {
         this.FYflag=false;
         this.SCflag=true;
         this.RSflag=true;
+
 
 
       
@@ -147,7 +173,10 @@ export default {
     // }
   },
   mounted() {
-    this.GetWord()
+    this.StartTab()
+    this.request()
+
+    
   }
 }
 </script>

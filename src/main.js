@@ -5,14 +5,20 @@ import router from './router'
 import store from './store'
 import './plugins/vant.js'
 import './assets/css/global.css'
+import CryptoJS from 'ajxa'
+import { Notify } from 'vant';
 
-Vue.config.productionTip = false
-Vue.prototype.$http = axios
-    // 单词来源api
-axios.defaults.baseURL = 'http://49.232.140.30:8080/word'
+
+
+// Vue.config.productionTip = false
+ Vue.prototype.$http = axios;
+
+
 
 new Vue({
     router,
     store,
+    Notify,
+    CryptoJS,
     render: h => h(App)
 }).$mount('#app')
