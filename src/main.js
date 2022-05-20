@@ -5,7 +5,7 @@ import router from './router'
 import store from './store'
 import './plugins/vant.js'
 import './assets/css/global.css'
-import CryptoJS from 'ajxa'
+import {CryptoJS} from 'ajax'
 import { Notify } from 'vant';
 
 

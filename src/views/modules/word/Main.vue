@@ -30,10 +30,10 @@
   </div>
 </template>
 
+
 <script>
 import Axios from 'axios';
-import CryptoJS from 'ajax';
-
+import {CryptoJS} from 'ajax';
 
 // api 传入数据
 var appKey = '78118035c259a1c6';
