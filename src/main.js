@@ -5,20 +5,13 @@ import router from './router'
 import store from './store'
 import './plugins/vant.js'
 import './assets/css/global.css'
-import {CryptoJS} from 'ajax'
-import { Notify } from 'vant';
+import { Notify } from 'vant'
 
-
-
-// Vue.config.productionTip = false
  Vue.prototype.$http = axios;
-
-
 
 new Vue({
     router,
     store,
     Notify,
-    CryptoJS,
     render: h => h(App)
 }).$mount('#app')

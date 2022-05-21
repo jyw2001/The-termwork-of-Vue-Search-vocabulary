@@ -3,27 +3,30 @@
     <!-- 头部 -->
     <van-nav-bar
         title="单词快翻"
-        
     />
     <!-- 中间主体 -->
     <div class="card" >
-      <!-- 字体颜色没有变化 -->
-      <input id='Serach' v-model="SearchWord" @click="SearchBox" class="SearchBox">
+      <!-- 输入框 -->
+      <input id='Serach' placeholder="输入单词" v-model="SearchWord" @click="SearchBox" class="SearchBox">
     </div>
+    <!-- 翻译的内容 -->
     <div class="card-info">
       <p v-text="wordPromptShow"></p>
+      <p></p>
       <p v-text="wordTranslationShow"></p>
     </div>
     <!-- 按键部分 -->
     <div class="buttons">
       <van-button type="warning" class="button1" @click="showWordTranslation" v-if="FYflag">翻译</van-button>
+      <!-- 收藏功能暂不完全 -->
       <van-button type="info" class="button2" @click="CollectWord" v-if="SCflag">收藏</van-button>
-      <van-button type="primary" class="button2" @click="StartTab" v-if="RSflag">认识</van-button>
+      <van-button type="primary" class="button2" @click="RemberWord" v-if="RSflag">认识</van-button>
     </div>
     <!-- 底部 -->
     <van-tabbar v-model="active" @change="onTabBarChange">
     
       <van-tabbar-item name="search" icon="search">搜索</van-tabbar-item>
+      <!-- 收藏页面、设置页面暂未开发完全 -->
       <van-tabbar-item name="Shoucang" icon="star">收藏</van-tabbar-item>
       <van-tabbar-item name="setting" icon="setting-o">设置</van-tabbar-item>
     </van-tabbar>
@@ -33,22 +36,19 @@
 
 <script>
 import Axios from 'axios';
-import {CryptoJS} from 'ajax';
+import { Notify } from 'vant';
 
 // api 传入数据
 var appKey = '78118035c259a1c6';
 var key = '7jv0TQz2FRVc5Q6FbzBhn70l1UwhCjBM';//注意：暴露appSecret，有被盗用造成损失的风险
 var salt = (new Date).getTime();
 var curtime = Math.round(new Date().getTime()/1000);
-var query = 'good';
 // 多个query可以用\n连接  如 query='apple\norange\nbanana\npear'
 var from = 'en';
 var to = 'zh-CHS';
-var str1 = appKey + truncate(query) + salt + curtime + key;
 var vocabId =  '';
 //console.log('---',str1);
-var sign = CryptoJS.SHA256(str1).toString(CryptoJS.enc.Hex);
-
+// API分割单词的函数 
 function truncate(q){
     var len = q.length;
     if(len<=20) return q;
@@ -58,88 +58,119 @@ function truncate(q){
 export default {
   data() {
     return {
-      SearchWord:'输入要查询单词',
+      // 搜索框内容
+      SearchWord:'',
+      // 按钮显示
       FYflag:true,
       SCflag:false,
       RSflag:false,
-      TBflag:'search',
-      
+      // 页面显示
+      TBflag:'search',      
       active: 'search',
-
-      
-      popShow: false, // 弹出框
-      word: {
-        wordId: '',//单词编号
-        word: '',//单词内容
-        wordPrompt: '',
-        wordTranslation: ''//单词意思
-      },
-      wordPromptShow: '测试-英文',
-      wordTranslationShow: '测试-翻译中文'
+      // 翻译内容：单词+翻译
+      wordPromptShow: '',
+      wordTranslationShow: ''
     }
   },
   methods: {
-    request(){
+
+    // 点击搜索框
+    SearchBox(){
+        this.SearchWord='';
+        this.FYflag=true;
+        this.SCflag=false;
+        this.RSflag=false;
+        this.wordPromptShow= '',
+        this.wordTranslationShow= ''
+
+    },
+    // 起始页
+    StartTab(){
+        this.FYflag=true;
+        this.SCflag=false;
+        this.RSflag=false;
+        this.wordPromptShow= '',
+        this.wordTranslationShow=''
+    },
+    // 收藏页面内容未完善敬请期待!!!
+    CollectWord() {
+      Notify({ type: 'warning', message: '敬请期待！' });
+      // if(this.TBflag=='search'){
+      //   this.FYflag=true;
+      //   this.SCflag=false;
+      //   this.RSflag=false;
+      // }
+      // else{
+      //   this.FYflag=false;
+      //   this.SCflag=true;
+      //   this.RSflag=true;
+      // }
+    },
+    // 认识按钮
+    RemberWord(){
+        location.reload()
+        // this.FYflag=true;
+        // // this.SCflag=false;
+        // this.RSflag=false;
+        // this.SearchWord='';
+        // this.wordPromptShow= '',
+        // this.wordTranslationShow= ''
+    },
+    // 翻译按钮翻译出输入框内容
+    showWordTranslation() {
+        var text=this.SearchWord.toString();
+        if(text===''){
+          Notify({ type: 'danger', message: '搜素单词不能为空' })
+        }
+        else{
+          this.FYflag=false;
+          this.SCflag=true;
+          this.RSflag=true;
+          var query=text;
+          var str1 = appKey + truncate(query) + salt + curtime + key;
+          var sign = CryptoJS.SHA256(str1).toString(CryptoJS.enc.Hex);
+          this.request(query,sign);
+        }
+        
+
+
+      
+    },
+    //API请求函数 
+    request(query,sign){
       Axios.get('/api/api',{
-        q: query,
-        appKey: appKey,
-        salt: salt,
-        from: from,
-        to: to,
-        sign: sign,
-        signType: "v3",
-        curtime: curtime,
-        vocabId: vocabId,
+        dataType:'jsonp',
+        params:{
+          q: query,
+          appKey: appKey,
+          salt: salt,
+          from: from,
+          to: to,
+          signType: "v3",
+          sign: sign,
+          curtime: curtime,
+          vocabId: vocabId,
+        }
+
       }).then(res=>{
         console.log(res.data);
-        // console.log(this.wordTranslationShow=res.data[1].data[2].data); 
+        this.wordPromptShow='英语：'+ query;
+        this.wordTranslationShow='翻译：'+res.data.basic.explains[1];
 
       }).catch(res=>{
         console.log(res);
       })
     },
-
-    SearchBox(){
-      this.SearchWord=''
-    },
-    StartTab(){
-      if(this.TBflag=='search'){
-        this.FYflag=true;
-        this.SCflag=false;
-        this.RSflag=false;
-      }
-      else{
-        this.FYflag=false;
-        this.SCflag=true;
-        this.RSflag=true;
-      }
-    },
-    CollectWord() {
-      if(this.TBflag=='search'){
-        this.FYflag=true;
-        this.SCflag=false;
-        this.RSflag=false;
-      }
-      else{
-        this.FYflag=false;
-        this.SCflag=true;
-        this.RSflag=true;
-      }
-
-    },
-    showWordTranslation() {
-        this.FYflag=false;
-        this.SCflag=true;
-        this.RSflag=true;
-
-
-
-      
-    },
-
     // 页面切换
     onTabBarChange (index) {
-      if(index=="setting"){
+      
+      if(index=='search'){
+        
+        this.FYflag=true;
+        this.SCflag=false;
+        this.RSflag=false;
+      }
+      else {
         Notify({ type: 'primary', message: '未开放' });
         this.FYflag=true;
         this.SCflag=false;
@@ -147,36 +178,13 @@ export default {
         this.TBflag="search";
         return this.active="search";
       }
-      else if(index=='search'){
-        this.FYflag=true;
-        this.SCflag=false;
-        this.RSflag=false;
-      }
-      else{
-        this.FYflag=false;
-        this.SCflag=true;
-        this.RSflag=true;
-      }
       this.active=index;
       this.TBflag=index;
       
     },
-    // onPopConfirm(value, index) {
-    //   this.range = value
-    //   this.popShow = false
-    //   this.getOneWord()
-    // },
-    // onPopChange(picker, value, index) {
-    // },
-    // onPopCancel() {
-    //   this.popShow = false
-    // }
   },
   mounted() {
     this.StartTab()
-    this.request()
-
-    
   }
 }
 </script>
@@ -204,9 +212,10 @@ export default {
   text-align: center;
   font-size: larger;
 }
+/* 翻译文本内容 */
 .card-info {
   margin: 40px 15px 40px 15px;
-  height: 220px;
+  height: 50%;
   padding-top: 10px;
   padding-left: 24px;
   padding-right: 24px;
@@ -224,15 +233,15 @@ export default {
 
 
 }
+/* 第一层按键样式 */
 .button1{
   margin-left: 40%;
-  width: 88px
+  width: 20%;
 }
+/* 第二层按键样式 */
 .button2{
   width: 88px;
-  margin-left: 50px;
-  margin-right: 50px;
-
-
+  margin-left: 20px;
+  margin-right: 20px;
 }
 </style>
