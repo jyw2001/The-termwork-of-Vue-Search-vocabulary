@@ -1,6 +1,6 @@
 import Vue from 'vue' //加载vue
 import VueRouter from 'vue-router' //加载vue-router 插件 工具 依赖
-import Main from '../views/modules/word/Main' //加载Main文件
+import Main from '../views/Main' //加载Main文件
 
 Vue.use(VueRouter)
 
