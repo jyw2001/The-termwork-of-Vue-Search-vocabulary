@@ -17,9 +17,9 @@
     </div>
     <!-- 按键部分 -->
     <div class="buttons">
-      <van-button type="warning" class="button1" @click="showWordTranslation" v-if="FYflag">翻译</van-button>
+      <van-button type="primary" class="button1" @click="showWordTranslation" v-if="FYflag">翻译</van-button>
       <!-- 收藏功能暂不完全 -->
-      <van-button type="info" class="button2" @click="CollectWord" v-if="SCflag">收藏</van-button>
+      <van-button type="warning" class="button2" @click="CollectWord" v-if="SCflag">收藏</van-button>
       <van-button type="primary" class="button2" @click="RemberWord" v-if="RSflag">认识</van-button>
     </div>
     <!-- 底部 -->
@@ -37,7 +37,7 @@
 <script>
 import Axios from 'axios';
 import { Notify } from 'vant';
-
+var text='';
 // api 传入数据
 var appKey = '78118035c259a1c6';
 var key = '7jv0TQz2FRVc5Q6FbzBhn70l1UwhCjBM';//注意：暴露appSecret，有被盗用造成损失的风险
@@ -69,7 +69,11 @@ export default {
       active: 'search',
       // 翻译内容：单词+翻译
       wordPromptShow: '',
-      wordTranslationShow: ''
+      wordTranslationShow: '',
+      words:{
+        Starword:'',
+        Translation:'',
+      },
     }
   },
   methods: {
@@ -92,19 +96,24 @@ export default {
         this.wordPromptShow= '',
         this.wordTranslationShow=''
     },
-    // 收藏页面内容未完善敬请期待!!!
+    // 收藏按钮
     CollectWord() {
-      Notify({ type: 'warning', message: '敬请期待！' });
-      // if(this.TBflag=='search'){
-      //   this.FYflag=true;
-      //   this.SCflag=false;
-      //   this.RSflag=false;
-      // }
-      // else{
-      //   this.FYflag=false;
-      //   this.SCflag=true;
-      //   this.RSflag=true;
-      // }
+
+      // Notify({ type: 'warning', message: '敬请期待！' });
+      if(this.TBflag=='search'){
+        this.FYflag=true;
+        this.SCflag=false;
+        this.RSflag=false;
+        this.words.Starword=this.wordPromptShow;
+        this.words.Translation=this.wordTranslationShow;
+        this.$store.commit('addStarword',this.words);
+        Notify({type: 'warning', message: '收藏单词：'+this.$store.state.counter});
+      }
+      else{
+        this.FYflag=false;
+        this.SCflag=true;
+        this.RSflag=true;
+      }
     },
     // 认识按钮
     RemberWord(){
@@ -118,7 +127,8 @@ export default {
     },
     // 翻译按钮翻译出输入框内容
     showWordTranslation() {
-        var text=this.SearchWord.toString();
+      // console.log(this.SearchWord);
+        text=this.SearchWord.toString();
         if(text===''){
           Notify({ type: 'danger', message: '搜素单词不能为空' })
         }
@@ -169,8 +179,23 @@ export default {
         this.FYflag=true;
         this.SCflag=false;
         this.RSflag=false;
+        this.TBflag="search";
       }
-      else {
+      if(index=='Shoucang'){
+        this.FYflag=false;
+        this.SCflag=false;
+        this.RSflag=true;
+        this.TBflag='shoucang';
+        if(this.$store.state.counter==0){
+          Notify({ type: 'primary', message: '没有收藏单词' });
+        }
+        else{
+          this.wordPromptShow='收藏'+ this.$store.state.words[0].Starword;
+          this.wordTranslationShow=this.$store.state.words[0].Translation;
+        }
+
+      }
+      else if(index=='setting') {
         Notify({ type: 'primary', message: '未开放' });
         this.FYflag=true;
         this.SCflag=false;
@@ -228,7 +253,8 @@ export default {
 /* 按键样式 */
 .buttons {
 
-  display: flex;
+  /* display: flex; */
+  align-items: center;
   justify-content: space-between;
 
 
@@ -241,7 +267,7 @@ export default {
 /* 第二层按键样式 */
 .button2{
   width: 88px;
-  margin-left: 20px;
-  margin-right: 20px;
+  margin-left:40% ;
+  margin-right: 0px;
 }
 </style>

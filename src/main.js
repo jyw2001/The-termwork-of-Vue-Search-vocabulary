@@ -6,6 +6,8 @@ import store from './store'
 import './plugins/vant.js'
 import './assets/css/global.css'
 import { Notify } from 'vant'
+import { Button } from 'vant'
+
 
  Vue.prototype.$http = axios;
 
@@ -13,5 +15,6 @@ new Vue({
     router,
     store,
     Notify,
+    Button,
     render: h => h(App)
 }).$mount('#app')
